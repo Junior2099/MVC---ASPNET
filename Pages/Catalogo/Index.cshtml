@@ -1,0 +1,58 @@
+@page
+@model PI.Pages.CatalogoModel
+@{
+    ViewData["Title"] = "Catálogo de Produtos";
+}
+
+<script>
+    function enviarWhatsApp(nomeProduto, preco) {
+        // Exibe o alerta
+        alert("Direcionando para WhatsApp");
+
+        // Número do WhatsApp (substitua pelo seu)
+        const numero = "5511999999999"; // Coloque seu número aqui
+
+        // Monta a mensagem
+        const mensagem = `Olá! Estou interessado no produto: ${nomeProduto} - Preço: ${preco}`;
+
+        // Codifica a mensagem para URL
+        const mensagemCodificada = encodeURIComponent(mensagem);
+
+        // Monta o link do WhatsApp
+        const linkWhatsApp = `https://wa.me/${numero}?text=${mensagemCodificada}`;
+
+        // Redireciona para o WhatsApp
+        window.location.href = linkWhatsApp;
+    }
+</script>
+
+<div class="container">
+    <h1 class="text-center my-4">Catálogo de Produtos</h1>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var produto in Model.Produtos)
+        {
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">@produto.Nome</h5>
+                    <p class="card-text">@produto.Descricao</p>
+                    <p class="card-text">
+                        <strong>Preço:</strong>
+                        @produto.Preco.ToString("C")
+                    </p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            Status: @(produto.EmEstoque ? "Disponível em estoque" : "Fora de estoque")
+                        </small>
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <button onclick="enviarWhatsApp('@produto.Nome', '@produto.Preco.ToString("C")')" class="btn btn-primary">
+                        Quero este produto
+                    </button>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</div>

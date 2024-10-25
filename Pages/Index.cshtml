@@ -1,0 +1,205 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+@section HomeImage {
+    <div class="home-image-container">
+        <img src="https://images.pexels.com/photos/1552252/pexels-photo-1552252.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Academia" class="home-image">
+    </div>
+}
+
+@section NavigationButton {
+    <div class="mt-3">
+    </div>
+}
+
+<div class="container mt-5">
+    <h1 class="display-4 text-center"> @User.Identity?.Name</h1>
+    
+    <div class="mt-5">
+        <div class="container">
+            <h2 class="mb-4">Temperatura Atual</h2>
+            <div class="search-box mb-3">
+                <input type="text" placeholder="Coloque sua localização" class="form-control">
+                <button class="btn btn-primary"><i class="fas fa-search"></i> Pesquisar </button>
+            </div>
+            <div class="weather-box text-center">
+                <i class="weather-icon fas fa-sun"></i>
+                <p class="temperature">25<span>°C</span></p>
+                <p class="description">Céu Limpo</p>
+            </div>
+            <div class="weather-details mt-3">
+                <div class="humidity">
+                    <i class="fas fa-water"></i>
+                    <span>60%</span>
+                    <p>Humidade</p>
+                </div>
+                <div class="wind">
+                    <i class="fas fa-wind"></i>
+                    <span>15Km/h</span>
+                    <p>Velocidade dos ventos</p>
+                </div>
+            </div>
+            <div class="not-found text-danger mt-3">
+                <p>Oops! Localização Inválida :/</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const searchButton = document.querySelector('.search-box button');
+        const input = document.querySelector('.search-box input');
+        const weatherBox = document.querySelector('.weather-box');
+        const weatherIcon = document.querySelector('.weather-icon');
+        const temperature = document.querySelector('.temperature');
+        const description = document.querySelector('.description');
+        const humidityElement = document.querySelector('.humidity span');
+        const windElement = document.querySelector('.wind span');
+        const notFound = document.querySelector('.not-found');
+
+        searchButton.addEventListener('click', () => {
+            const city = input.value;
+            const APIKey = '645b2516be8c82fbf7e2b5b83cafbb49'; // Substitua pela sua chave da API
+
+            if (city === '') return;
+
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cod === '404') {
+                        notFound.style.display = 'block';
+                        weatherBox.style.display = 'none';
+                        return;
+                    }
+
+                    notFound.style.display = 'none';
+                    weatherBox.style.display = 'block';
+
+                    const weatherData = data.weather[0];
+                    const mainData = data.main;
+                    const windData = data.wind;
+
+                    temperature.innerHTML = `${Math.round(mainData.temp)}<span>°C</span>`;
+                    description.innerHTML = weatherData.description;
+                    humidityElement.innerHTML = `${mainData.humidity}%`;
+                    windElement.innerHTML = `${Math.round(windData.speed)}Km/h`;
+
+                    // Define o ícone com base no clima
+                    switch (weatherData.main) {
+                        case 'Clear':
+                            weatherIcon.className = 'weather-icon fas fa-sun';
+                            break;
+                        case 'Rain':
+                            weatherIcon.className = 'weather-icon fas fa-cloud-rain';
+                            break;
+                        case 'Snow':
+                            weatherIcon.className = 'weather-icon fas fa-snowflake';
+                            break;
+                        case 'Clouds':
+                            weatherIcon.className = 'weather-icon fas fa-cloud';
+                            break;
+                        case 'Haze':
+                            weatherIcon.className = 'weather-icon fas fa-smog';
+                            break;
+                        default:
+                            weatherIcon.className = 'weather-icon fas fa-question';
+                    }
+                })
+                .catch(() => {
+                    notFound.style.display = 'block';
+                    weatherBox.style.display = 'none';
+                });
+        });
+    </script>
+}
+<style>
+    .btn-primary {
+    background-color: #003399;
+    border: none;
+    color: #000000;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+.btn-primary .fas {
+    margin-right: 8px;
+}
+.btn-primary:hover {
+    background-color: #003399;
+    color: #ffffff;
+}
+
+.dark-theme .btn-primary {
+    background-color: #003399;
+    border: none;
+    color: #ffffff;
+}
+.dark-theme .btn-primary:hover {
+    background-color: #003399;
+    color: #ffffff;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.search-box input {
+    width: 80%;
+    font-size: 24px;
+    padding-left: 12px;
+}
+.search-box button {
+    background: #dff6ff;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.weather-box {
+    margin-top: 20px;
+}
+    .weather-icon {
+        font-size: 60px;
+        color: #e95420;
+        margin: 20px 0;
+    }
+    .temperature {
+        font-size: 4rem;
+        color: #e95420;
+    }
+    .description {
+        color: #e95420;
+        font-size: 22px;
+    }
+.weather-details {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+.humidity, .wind {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+    .humidity i, .wind i {
+        font-size: 26px;
+        color: #e95420;
+    }
+    .humidity span, .wind span {
+        font-size: 22px;
+        color: #e95420;
+    }
+    .not-found {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+        color: #e95420;
+    }
+
+</style>
